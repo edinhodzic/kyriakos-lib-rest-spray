@@ -1,0 +1,10 @@
+/log/
+target
+*.class
+*.iml
+*.ipr
+*.iws
+.idea
+out
+.history
+.DS_Store
