@@ -3,7 +3,7 @@ package io.otrl.library.rest.spray
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
-import io.otrl.library.rest.converter.AbstractHttpEntityConverter
+import io.otrl.library.rest.converter.HttpEntityConverter
 import spray.http.HttpEntity
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._
@@ -14,12 +14,16 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 // TODO inject collaborators
+/**
+  * A router which exposes REST functionality for a single resource.
+  * @tparam T the resource for which to expose REST functionality
+  */
 class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
   // TODO instead of having the complete(..) in pattern match cases, it would be good to use repositoryTemplate unless that makes the code less legible
-  def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], httpEntityConverter: AbstractHttpEntityConverter[T]): Route = post {
+  def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], httpEntityConverter: HttpEntityConverter[T]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity => val resource: T = httpEntityConverter.toResource(httpEntity)
         logger info s"creating $resource"
@@ -35,7 +39,7 @@ class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) exte
     }
   }
 
-  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with WholeUpdates[T], httpEntityConverter: AbstractHttpEntityConverter[T]): Route = {
+  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with WholeUpdates[T], httpEntityConverter: HttpEntityConverter[T]): Route = {
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {

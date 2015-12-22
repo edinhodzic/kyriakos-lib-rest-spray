@@ -1,7 +1,7 @@
 package io.otrl.library.rest.spray
 
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
-import io.otrl.library.rest.converter.ResourceHttpEntityConverter
+import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
 import io.otrl.library.rest.spray.ResourceRestRouterSpec._
 import org.mockito.Matchers
@@ -25,23 +25,13 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
   def actorRefFactory = system // connect dsl to test actor system
 
   private implicit val repository: AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource]]
-  private implicit val converter: ResourceHttpEntityConverter = mock[ResourceHttpEntityConverter]
+  private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
   private val resourceRestRouter: ResourceRestRouter[Resource] = new ResourceRestRouter[Resource]
   private val collectionRoute: Route = resourceRestRouter.collectionRoute
   private val itemRoute: Route = resourceRestRouter.itemRoute
 
-  private val resourceId: String = "507c35dd8fada716c89d0013"
-
-  private val resource: Resource = new Resource("bob") {
-    id = resourceId
-  }
-
-  private val bobHttpEntity: HttpEntity = HttpEntity( """{ "name" : "bob" }""")
-
-  "Controller post function" should {
-
-    val bobJson: String = """{ "name" : "bob" }"""
+  "Resource rest router post function" should {
 
     def mockRepositoryCreateToReturnSuccess =
       mockRepositoryCreateToReturn(Success(resource))
@@ -56,24 +46,24 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
       invokePost(uri, json, route) ~> check(block)
 
     "invoke repository create function" in {
-      mockConverter(resource, bobHttpEntity)
+      mockConverter(resource, httpEntity)
       mockRepositoryCreateToReturnSuccess
-      invokePost("/resource", bobJson, collectionRoute)
+      invokePost("/resource", resourceJson, collectionRoute)
       there was one(repository).create(resource)
     }
 
     "return http created when repository create succeeds" in {
-      mockConverter(resource, bobHttpEntity)
+      mockConverter(resource, httpEntity)
       mockRepositoryCreateToReturnSuccess
-      verifyPost("/resource", bobJson, collectionRoute) {
+      verifyPost("/resource", resourceJson, collectionRoute) {
         status === Created
       }
     }
 
     "return correct location header when repository create succeeds" in {
-      mockConverter(resource, bobHttpEntity)
+      mockConverter(resource, httpEntity)
       mockRepositoryCreateToReturnSuccess
-      verifyPost("/resource", bobJson, collectionRoute) {
+      verifyPost("/resource", resourceJson, collectionRoute) {
         val locationHeader: Option[HttpHeader] = header("Location")
         locationHeader.isDefined === true
         locationHeader.get.value === s"/resource/$resourceId"
@@ -81,16 +71,16 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
     }
 
     "return resource as response body when repository create succeeds" in {
-      mockConverter(resource, bobHttpEntity)
+      mockConverter(resource, httpEntity)
       mockRepositoryCreateToReturnSuccess
-      verifyPost("/resource", bobJson, collectionRoute) {
-        JsonParser(response.entity.asString) should beEqualTo(JsonParser(bobJson))
+      verifyPost("/resource", resourceJson, collectionRoute) {
+        JsonParser(response.entity.asString) should beEqualTo(JsonParser(resourceJson))
       }
     }
 
     "return http internal server error when repository create fails" in {
       repository create Matchers.any(classOf[Resource]) throws new RuntimeException
-      verifyPost("/resource", bobJson, collectionRoute) {
+      verifyPost("/resource", resourceJson, collectionRoute) {
         status === InternalServerError
       }
     }
@@ -102,14 +92,14 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
       repository read anyString returns triedMaybeResource
 
     "invoke repository read function" in {
-      mockConverterWith(bobHttpEntity)
+      mockConverterWith(httpEntity)
       mockRepositoryReadToReturn(Success(Some(resource)))
       Get("/resource/123") ~> itemRoute
       there was one(repository).read("123")
     }
 
     "return http ok status when repository read succeeds with some" in {
-      mockConverterWith(bobHttpEntity)
+      mockConverterWith(httpEntity)
       mockRepositoryReadToReturn(Success(Some(resource)))
       Get("/resource/123") ~> itemRoute ~> check {
         status === OK
@@ -117,7 +107,7 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
     }
 
     "return http not found status when repository read succeeds with none" in {
-      mockConverterWith(bobHttpEntity)
+      mockConverterWith(httpEntity)
       mockRepositoryReadToReturn(Success(None))
       Get("/resource/123") ~> itemRoute ~> check {
         status === NotFound
@@ -183,11 +173,11 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
   }
 
   def mockConverterWith(resource: Resource): OngoingStubbing[Resource] = {
-    converter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
+    resourceConverter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
   }
 
   def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
-    converter.toHttpEntity(Matchers.any(classOf[Resource])) returns httpEntity
+    resourceConverter.toHttpEntity(Matchers.any(classOf[Resource])) returns httpEntity
   }
 
 }
@@ -197,5 +187,15 @@ object ResourceRestRouterSpec {
   private def jsonHttpEntity[T](json: String): HttpEntity = HttpEntity(`application/json`, json)
 
   private val contentTypeJson: `Content-Type` = HttpHeaders.`Content-Type`(`application/json`)
+
+  private val resourceId: String = "507c35dd8fada716c89d0013"
+
+  private val resource: Resource = new Resource("value") {
+    id = resourceId
+  }
+
+  private val resourceJson: String = """{ "data" : "value" }"""
+
+  private val httpEntity: HttpEntity = HttpEntity(resourceJson)
 
 }

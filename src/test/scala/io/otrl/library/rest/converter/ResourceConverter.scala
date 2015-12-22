@@ -3,7 +3,7 @@ package io.otrl.library.rest.converter
 import io.otrl.library.rest.domain.Resource
 import spray.http.HttpEntity
 
-class ResourceHttpEntityConverter extends AbstractHttpEntityConverter[Resource] {
+class ResourceConverter extends HttpEntityConverter[Resource] {
 
   override def toResource(httpEntity: HttpEntity): Resource = new Resource("value")
 
