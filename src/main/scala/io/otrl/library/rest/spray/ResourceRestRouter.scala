@@ -4,7 +4,6 @@ import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.domain.AbstractHttpEntityConverter
-import io.otrl.library.rest.spray.CustomerRestService._
 import spray.http.HttpEntity
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._
@@ -16,7 +15,7 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 // TODO inject collaborators
-class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends LazyLogging {
+class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
