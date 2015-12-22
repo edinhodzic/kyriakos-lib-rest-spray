@@ -1,15 +1,17 @@
 package io.otrl.library.rest.spray
 
-import io.otrl.library.rest.domain.Customer
-import io.otrl.library.rest.repository.CustomerRepository
-import io.otrl.library.rest.spray.CustomerRestRouter.collectionRoute
+import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
+import io.otrl.library.rest.domain.{Customer, CustomerHttpEntityConverter}
+import org.mockito.stubbing.OngoingStubbing
+
+//import io.otrl.library.rest.spray.CustomerRestRouter.collectionRoute
 import io.otrl.library.rest.spray.CustomerRestRouterSpec._
 import org.mockito.Matchers
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import spray.http.ContentTypes._
-import spray.http.HttpHeaders.{Location, `Content-Type`}
-import spray.http.StatusCodes.{Created, InternalServerError, NotFound, NoContent, OK}
+import spray.http.HttpHeaders.`Content-Type`
+import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound, OK}
 import spray.http._
 import spray.json._
 import spray.routing.{HttpService, Route}
@@ -23,12 +25,32 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
 
   def actorRefFactory = system // connect dsl to test actor system
 
-  private implicit val repository: CustomerRepository = mock[CustomerRepository]
+  private implicit val repository: AbstractPartialCrudRepository[Customer] with WholeUpdates[Customer] = mock[AbstractPartialCrudRepository[Customer] with WholeUpdates[Customer]]
+  private implicit val converter: CustomerHttpEntityConverter = mock[CustomerHttpEntityConverter]
+
+  private val customerRestRouter: ResourceRestRouter[Customer] = new ResourceRestRouter[Customer]
+  private val collectionRoute: Route = customerRestRouter.collectionRoute
+  private val itemRoute: Route = customerRestRouter.itemRoute
 
   private val resourceId: String = "507c35dd8fada716c89d0013"
 
   private val resource: Customer = new Customer("bob") {
     id = resourceId
+  }
+
+  val bobHttpEntity: HttpEntity = HttpEntity( """{ "name" : "bob" }""")
+
+  def mockConverter(resource: Customer, httpEntity: HttpEntity) = {
+    mockConverterWith(resource)
+    mockConverterWith(httpEntity)
+  }
+
+  def mockConverterWith(resource: Customer): OngoingStubbing[Customer] = {
+    converter.convert(Matchers.any(classOf[HttpEntity])) returns resource
+  }
+
+  def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
+    converter.convert(Matchers.any(classOf[Customer])) returns httpEntity
   }
 
   "Controller post function" should {
@@ -48,12 +70,14 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
       invokePost(uri, json, route) ~> check(block)
 
     "invoke repository create function" in {
+      mockConverter(resource, bobHttpEntity)
       mockRepositoryCreateToReturnSuccess
       invokePost("/customer", bobJson, collectionRoute)
       there was one(repository).create(resource)
     }
 
     "return http created when repository create succeeds" in {
+      mockConverter(resource, bobHttpEntity)
       mockRepositoryCreateToReturnSuccess
       verifyPost("/customer", bobJson, collectionRoute) {
         status === Created
@@ -61,6 +85,7 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
     }
 
     "return correct location header when repository create succeeds" in {
+      mockConverter(resource, bobHttpEntity)
       mockRepositoryCreateToReturnSuccess
       verifyPost("/customer", bobJson, collectionRoute) {
         val locationHeader: Option[HttpHeader] = header("Location")
@@ -70,6 +95,7 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
     }
 
     "return resource as response body when repository create succeeds" in {
+      mockConverter(resource, bobHttpEntity)
       mockRepositoryCreateToReturnSuccess
       verifyPost("/customer", bobJson, collectionRoute) {
         JsonParser(response.entity.asString) should beEqualTo(JsonParser(bobJson))
@@ -90,28 +116,31 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
       repository read anyString returns triedMaybeCustomer
 
     "invoke repository read function" in {
+      mockConverterWith(bobHttpEntity)
       mockRepositoryReadToReturn(Success(Some(resource)))
-      Get("/customer/123") ~> CustomerRestRouter.itemRoute
+      Get("/customer/123") ~> itemRoute
       there was one(repository).read("123")
     }
 
     "return http ok status when repository read succeeds with some" in {
+      mockConverterWith(bobHttpEntity)
       mockRepositoryReadToReturn(Success(Some(resource)))
-      Get("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Get("/customer/123") ~> itemRoute ~> check {
         status === OK
       }
     }
 
     "return http not found status when repository read succeeds with none" in {
+      mockConverterWith(bobHttpEntity)
       mockRepositoryReadToReturn(Success(None))
-      Get("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Get("/customer/123") ~> itemRoute ~> check {
         status === NotFound
       }
     }
 
     "return http internal server error status when repository read fails with exception" in {
       repository read anyString throws new RuntimeException
-      Get("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Get("/customer/123") ~> itemRoute ~> check {
         status === InternalServerError
       }
     }
@@ -130,27 +159,27 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
 
     "invoke repository delete function" in {
       mockRepositoryDeleteToReturn(Success(Some()))
-      Delete("/customer/123") ~> CustomerRestRouter.itemRoute
+      Delete("/customer/123") ~> itemRoute
       there was one(repository).delete("123")
     }
 
     "return http no content status when repository delete succeeds with some" in {
       mockRepositoryDeleteToReturn(Success(Some()))
-      Delete("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Delete("/customer/123") ~> itemRoute ~> check {
         status === NoContent
       }
     }
 
     "return http not found status when repository delete succeeds with none" in {
       mockRepositoryDeleteToReturn(Success(None))
-      Delete("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Delete("/customer/123") ~> itemRoute ~> check {
         status === NotFound
       }
     }
 
     "return http internal server error status when repository delete fails with exception" in {
       repository read anyString throws new RuntimeException
-      Delete("/customer/123") ~> CustomerRestRouter.itemRoute ~> check {
+      Delete("/customer/123") ~> itemRoute ~> check {
         status === InternalServerError
       }
     }

@@ -4,7 +4,7 @@ organization := "io.otrl.library"
 
 name := "otrl-lib-rest-spray"
 
-version := "0.1.0-SNAPSHOT"
+version := "0.6.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
@@ -23,13 +23,11 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.typesafe.scala-logging" % "scala-logging_2.11" % "3.1.0",
   // otrl
-  "io.otrl.library" % "otrl-lib-domain_2.11" % "0.1.0-SNAPSHOT",
-  "io.otrl.library" % "otrl-lib-repository-h2_2.11" % "0.1.0-SNAPSHOT",
+  "io.otrl.library" % "otrl-lib-domain_2.11" % "0.5.0-SNAPSHOT",
+  "io.otrl.library" % "otrl-lib-repository-h2_2.11" % "0.5.0-SNAPSHOT",
   // test
   "io.spray" % "spray-testkit_2.11" % "1.3.3" % "test",
   "org.specs2" % "specs2-core_2.11" % "3.6.6" % "test",
   "org.specs2" % "specs2-junit_2.11" % "3.6.6" % "test",
   "org.specs2" % "specs2-mock_2.11" % "3.6.6" % "test"
 )
-
-mainClass in Compile := Some("io.otrl.library.rest.spray.CustomerRestService")
