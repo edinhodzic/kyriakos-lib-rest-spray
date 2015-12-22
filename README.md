@@ -55,6 +55,7 @@ The router and repository rely on abstractions within another library hence they
 - `UserRestRouter`
 - `UserCrudRepository`
 - `UserConverter`
+- `UserRestService`
 
 Let's build this bottom up.
 
@@ -65,11 +66,11 @@ case class User(data: String) extends Identifiable
 
 ### Converter implementation
 ```scala
-class UserConverter extends HttpEntityConverter[User] {
+class UserConverter extends Converter[User, HttpEntity] {
 
-  override def toResource(httpEntity: HttpEntity): User = new User("bob")
+  override def serialise(user: User): HttpEntity = HttpEntity( """{ "data" : "value" } """)
 
-  override def toHttpEntity(user: User): HttpEntity = HttpEntity( """{ "data" : "bob" } """)
+  override def deserialise(httpEntity: HttpEntity): User = new User("value")
 
 }
 ```
