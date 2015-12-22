@@ -3,7 +3,7 @@ package io.otrl.library.rest.spray
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
-import io.otrl.library.rest.domain.AbstractHttpEntityConverter
+import io.otrl.library.rest.converter.AbstractHttpEntityConverter
 import spray.http.HttpEntity
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._

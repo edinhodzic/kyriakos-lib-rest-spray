@@ -1,4 +1,4 @@
-package io.otrl.library.rest.domain
+package io.otrl.library.rest.converter
 
 import io.otrl.library.domain.Identifiable
 import spray.http.HttpEntity
