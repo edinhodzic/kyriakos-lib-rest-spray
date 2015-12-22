@@ -15,18 +15,19 @@ import spray.routing._
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-// TODO make this generic
 // TODO inject collaborators
-class ResourceRestRouter[T <: Identifiable] extends LazyLogging {
+class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends LazyLogging {
+
+  private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
   // TODO instead of having the complete(..) in pattern match cases, it would be good to use repositoryTemplate unless that makes the code less legible
   def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], httpEntityConverter: AbstractHttpEntityConverter[T]): Route = post {
-    (pathPrefix("customer") & pathEndOrSingleSlash) {
+    (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity => val resource: T = httpEntityConverter.convert(httpEntity)
         logger info s"creating $resource"
         repository create resource match {
           case Success(resource) =>
-            respondWithHeader(Location(s"/customer/${resource.id}")) {
+            respondWithHeader(Location(s"/$serviceUrlPath/${resource.id}")) {
               complete(Created, httpEntityConverter.convert(resource))
             }
           case Failure(throwable) => complete(internalServerError(throwable))
@@ -64,7 +65,7 @@ class ResourceRestRouter[T <: Identifiable] extends LazyLogging {
       }
     }
 
-    (pathPrefix("customer") & path(Segment) & pathEndOrSingleSlash) { implicit resourceId: String =>
+    (pathPrefix(serviceUrlPath) & path(Segment) & pathEndOrSingleSlash) { implicit resourceId: String =>
       getRoute ~ putRoute ~ deleteRoute
     }
   }
