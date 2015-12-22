@@ -18,7 +18,7 @@ import scala.util.{Failure, Success, Try}
   * A router which exposes REST functionality for a single resource.
   * @tparam T the resource for which to expose REST functionality
   */
-class ResourceRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
+class RestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 

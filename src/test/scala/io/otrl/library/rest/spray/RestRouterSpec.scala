@@ -3,7 +3,7 @@ package io.otrl.library.rest.spray
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
-import io.otrl.library.rest.spray.ResourceRestRouterSpec._
+import io.otrl.library.rest.spray.RestRouterSpec._
 import org.mockito.Matchers
 import org.mockito.stubbing.OngoingStubbing
 import org.specs2.mock.Mockito
@@ -19,7 +19,7 @@ import spray.testkit.Specs2RouteTest
 import scala.language.postfixOps
 import scala.util.{Success, Try}
 
-class ResourceRestRouterSpec extends Specification with Specs2RouteTest with HttpService with Mockito {
+class RestRouterSpec extends Specification with Specs2RouteTest with HttpService with Mockito {
   isolated
 
   def actorRefFactory = system // connect dsl to test actor system
@@ -27,7 +27,7 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
   private implicit val repository: AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource]]
   private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
-  private val resourceRestRouter: ResourceRestRouter[Resource] = new ResourceRestRouter[Resource]
+  private val resourceRestRouter: RestRouter[Resource] = new RestRouter[Resource]
   private val collectionRoute: Route = resourceRestRouter.collectionRoute
   private val itemRoute: Route = resourceRestRouter.itemRoute
 
@@ -182,7 +182,7 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
 
 }
 
-object ResourceRestRouterSpec {
+object RestRouterSpec {
 
   private def jsonHttpEntity[T](json: String): HttpEntity = HttpEntity(`application/json`, json)
 
