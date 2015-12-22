@@ -5,8 +5,8 @@ import spray.http.HttpEntity
 
 abstract class AbstractHttpEntityConverter[T <: Identifiable] {
 
-  def convert(httpEntity: HttpEntity): T
+  def toResource(httpEntity: HttpEntity): T
 
-  def convert(resource: T): HttpEntity
+  def toHttpEntity(resource: T): HttpEntity
 
 }

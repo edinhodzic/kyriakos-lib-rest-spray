@@ -2,11 +2,9 @@ package io.otrl.library.rest.spray
 
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.domain.{Customer, CustomerHttpEntityConverter}
-import org.mockito.stubbing.OngoingStubbing
-
-//import io.otrl.library.rest.spray.CustomerRestRouter.collectionRoute
 import io.otrl.library.rest.spray.CustomerRestRouterSpec._
 import org.mockito.Matchers
+import org.mockito.stubbing.OngoingStubbing
 import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import spray.http.ContentTypes._
@@ -38,7 +36,7 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
     id = resourceId
   }
 
-  val bobHttpEntity: HttpEntity = HttpEntity( """{ "name" : "bob" }""")
+  private val bobHttpEntity: HttpEntity = HttpEntity( """{ "name" : "bob" }""")
 
   def mockConverter(resource: Customer, httpEntity: HttpEntity) = {
     mockConverterWith(resource)
@@ -46,11 +44,11 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
   }
 
   def mockConverterWith(resource: Customer): OngoingStubbing[Customer] = {
-    converter.convert(Matchers.any(classOf[HttpEntity])) returns resource
+    converter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
   }
 
   def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
-    converter.convert(Matchers.any(classOf[Customer])) returns httpEntity
+    converter.toHttpEntity(Matchers.any(classOf[Customer])) returns httpEntity
   }
 
   "Controller post function" should {
