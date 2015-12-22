@@ -1,5 +1,6 @@
-package io.otrl.library.rest.domain
+package io.otrl.library.rest.converter
 
+import io.otrl.library.rest.domain.{AbstractHttpEntityConverter, Customer}
 import spray.http.HttpEntity
 
 // TODO move to otrl-service-rest-customer

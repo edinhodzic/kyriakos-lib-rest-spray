@@ -1,7 +1,8 @@
 package io.otrl.library.rest.spray
 
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
-import io.otrl.library.rest.domain.{Customer, CustomerHttpEntityConverter}
+import io.otrl.library.rest.converter.CustomerHttpEntityConverter
+import io.otrl.library.rest.domain.Customer
 import io.otrl.library.rest.spray.ResourceRestRouterSpec._
 import org.mockito.Matchers
 import org.mockito.stubbing.OngoingStubbing
@@ -37,19 +38,6 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
   }
 
   private val bobHttpEntity: HttpEntity = HttpEntity( """{ "name" : "bob" }""")
-
-  def mockConverter(resource: Customer, httpEntity: HttpEntity) = {
-    mockConverterWith(resource)
-    mockConverterWith(httpEntity)
-  }
-
-  def mockConverterWith(resource: Customer): OngoingStubbing[Customer] = {
-    converter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
-  }
-
-  def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
-    converter.toHttpEntity(Matchers.any(classOf[Customer])) returns httpEntity
-  }
 
   "Controller post function" should {
 
@@ -188,6 +176,19 @@ class ResourceRestRouterSpec extends Specification with Specs2RouteTest with Htt
   // TODO implement me
   //    }
   //  }
+
+  def mockConverter(resource: Customer, httpEntity: HttpEntity) = {
+    mockConverterWith(resource)
+    mockConverterWith(httpEntity)
+  }
+
+  def mockConverterWith(resource: Customer): OngoingStubbing[Customer] = {
+    converter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
+  }
+
+  def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
+    converter.toHttpEntity(Matchers.any(classOf[Customer])) returns httpEntity
+  }
 
 }
 
