@@ -18,14 +18,15 @@ import scala.util.{Failure, Success, Try}
   * A router which exposes REST functionality for a single resource.
   * @tparam T the resource for which to expose REST functionality
   */
-class RestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
+class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
   // TODO instead of having the complete(..) in pattern match cases, it would be good to use repositoryTemplate unless that makes the code less legible
   def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], httpEntityConverter: HttpEntityConverter[T]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
-      entity(as[HttpEntity]) { httpEntity => val resource: T = httpEntityConverter.toResource(httpEntity)
+      entity(as[HttpEntity]) { httpEntity : HttpEntity =>
+        val resource: T = httpEntityConverter.toResource(httpEntity)
         logger info s"creating $resource"
         repository create resource match {
           case Success(resource) =>
@@ -44,7 +45,7 @@ class RestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends Simp
     def getRoute(implicit resourceId: String): Route = get {
       complete {
         logger info s"reading $resourceId"
-        repositoryTemplate(repository read resourceId) { resource =>
+        repositoryTemplate(repository read resourceId) { resource : T =>
           httpEntityConverter.toHttpEntity(resource)
         }
       }
@@ -55,7 +56,7 @@ class RestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends Simp
         complete {
           logger info s"updating $resourceId"
           val resource: T = httpEntityConverter.toResource(httpEntity)
-          repositoryTemplate(repository update resource) { resource => NoContent }
+          repositoryTemplate(repository update resource) { resource : T => NoContent }
         }
       }
     }
@@ -63,7 +64,7 @@ class RestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends Simp
     def deleteRoute(implicit resourceId: String): Route = delete {
       complete {
         logger info s"deleting $resourceId"
-        repositoryTemplate(repository delete resourceId) { unit => NoContent }
+        repositoryTemplate(repository delete resourceId) { unit : Unit => NoContent }
       }
     }
 
