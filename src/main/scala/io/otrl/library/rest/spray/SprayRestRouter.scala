@@ -2,7 +2,7 @@ package io.otrl.library.rest.spray
 
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
-import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
+import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.converter.HttpEntityConverter
 import spray.http.HttpEntity
 import spray.http.HttpHeaders.Location
@@ -40,7 +40,7 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
     }
   }
 
-  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with WholeUpdates[T], httpEntityConverter: HttpEntityConverter[T]): Route = {
+  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with PartialUpdates[T], httpEntityConverter: HttpEntityConverter[T]): Route = {
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {
@@ -51,12 +51,21 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
       }
     }
 
+//    def putRoute(implicit resourceId: String): Route = put {
+//      entity(as[HttpEntity]) { httpEntity =>
+//        complete {
+//          logger info s"updating $resourceId"
+//          val resource: T = httpEntityConverter.toResource(httpEntity)
+//          repositoryTemplate(repository update resource) { resource => NoContent }
+//        }
+//      }
+//    }
+
     def putRoute(implicit resourceId: String): Route = put {
-      entity(as[HttpEntity]) { httpEntity =>
+      entity(as[String]) { httpEntity =>
         complete {
           logger info s"updating $resourceId"
-          val resource: T = httpEntityConverter.toResource(httpEntity)
-          repositoryTemplate(repository update resource) { resource : T => NoContent }
+          repositoryTemplate(repository update (resourceId, httpEntity)) { resource => NoContent }
         }
       }
     }

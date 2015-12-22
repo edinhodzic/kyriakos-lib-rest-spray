@@ -1,6 +1,6 @@
 package io.otrl.library.rest.spray
 
-import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
+import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
 import io.otrl.library.rest.spray.SprayRestRouterSpec._
@@ -24,7 +24,7 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
 
   def actorRefFactory = system // connect dsl to test actor system
 
-  private implicit val repository: AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with WholeUpdates[Resource]]
+  private implicit val repository: AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource]]
   private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
   private val resourceRestRouter: SprayRestRouter[Resource] = new SprayRestRouter[Resource]
