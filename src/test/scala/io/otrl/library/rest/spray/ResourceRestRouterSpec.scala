@@ -2,7 +2,7 @@ package io.otrl.library.rest.spray
 
 import io.otrl.library.repository.{AbstractPartialCrudRepository, WholeUpdates}
 import io.otrl.library.rest.domain.{Customer, CustomerHttpEntityConverter}
-import io.otrl.library.rest.spray.CustomerRestRouterSpec._
+import io.otrl.library.rest.spray.ResourceRestRouterSpec._
 import org.mockito.Matchers
 import org.mockito.stubbing.OngoingStubbing
 import org.specs2.mock.Mockito
@@ -18,7 +18,7 @@ import spray.testkit.Specs2RouteTest
 import scala.language.postfixOps
 import scala.util.{Success, Try}
 
-class CustomerRestRouterSpec extends Specification with Specs2RouteTest with HttpService with Mockito {
+class ResourceRestRouterSpec extends Specification with Specs2RouteTest with HttpService with Mockito {
   isolated
 
   def actorRefFactory = system // connect dsl to test actor system
@@ -191,7 +191,7 @@ class CustomerRestRouterSpec extends Specification with Specs2RouteTest with Htt
 
 }
 
-object CustomerRestRouterSpec {
+object ResourceRestRouterSpec {
 
   private def jsonHttpEntity[T](json: String): HttpEntity = HttpEntity(`application/json`, json)
 
