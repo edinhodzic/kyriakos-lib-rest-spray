@@ -106,20 +106,42 @@ object UserRestService extends App with SimpleRoutingApp {
     TODO document this
 
 ### Create a resource
+```
+$ curl -iL -X POST http://localhost:9000/user -H content-type:application/json -d '{ "data" : "bob" }'
+HTTP/1.1 201 Created
+Server: spray-can/1.3.3
+Date: Tue, 22 Dec 2015 17:46:11 GMT
+Location: /user/123
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 21
+
+{ "data" : "bob" }
+```
     
-    TODO document this
-    
-### Read a resource
-    
-    TODO document this
+### Read a resource    
+```
+$ curl -iL http://localhost:9000/user/123
+HTTP/1.1 200 OK
+Server: spray-can/1.3.3
+Date: Tue, 22 Dec 2015 17:46:29 GMT
+Content-Type: text/plain; charset=UTF-8
+Content-Length: 21
+
+{ "data" : "bob" }
+```
 
 ### Update a resource
     
     TODO document this
 
-### Delete a resource
-    
-    TODO document this
+### Delete a resource 
+```
+$ curl -iL -X DELETE http://localhost:9000/user/123
+HTTP/1.1 204 No Content
+Server: spray-can/1.3.3
+Date: Tue, 22 Dec 2015 17:46:37 GMT
+Content-Length: 0
+```
 
 ### Query a resource
     
