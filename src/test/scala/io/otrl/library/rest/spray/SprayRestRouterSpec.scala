@@ -173,11 +173,11 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
   }
 
   def mockConverterWith(resource: Resource): OngoingStubbing[Resource] = {
-    resourceConverter.toResource(Matchers.any(classOf[HttpEntity])) returns resource
+    resourceConverter.deserialise(Matchers.any(classOf[HttpEntity])) returns resource
   }
 
   def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
-    resourceConverter.toHttpEntity(Matchers.any(classOf[Resource])) returns httpEntity
+    resourceConverter.serialise(Matchers.any(classOf[Resource])) returns httpEntity
   }
 
 }

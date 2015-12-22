@@ -2,8 +2,7 @@ package io.otrl.library.rest.spray
 
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
-import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
-import io.otrl.library.rest.converter.HttpEntityConverter
+import io.otrl.library.repository.{Converter, PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
 import spray.http.HttpEntity
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes._
@@ -23,15 +22,15 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
   // TODO instead of having the complete(..) in pattern match cases, it would be good to use repositoryTemplate unless that makes the code less legible
-  def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], httpEntityConverter: HttpEntityConverter[T]): Route = post {
+  def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity : HttpEntity =>
-        val resource: T = httpEntityConverter.toResource(httpEntity)
+        val resource: T = converter.deserialise(httpEntity)
         logger info s"creating $resource"
         repository create resource match {
           case Success(resource) =>
             respondWithHeader(Location(s"/$serviceUrlPath/${resource.id}")) {
-              complete(Created, httpEntityConverter.toHttpEntity(resource))
+              complete(Created, converter.serialise(resource))
             }
           case Failure(throwable) => complete(internalServerError(throwable))
           case _ => complete(internalServerError("unknown repository failure"))
@@ -40,13 +39,13 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
     }
   }
 
-  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with PartialUpdates[T], httpEntityConverter: HttpEntityConverter[T]): Route = {
+  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with PartialUpdates[T], converter: Converter[T, HttpEntity]): Route = {
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {
         logger info s"reading $resourceId"
         repositoryTemplate(repository read resourceId) { resource : T =>
-          httpEntityConverter.toHttpEntity(resource)
+          converter.serialise(resource)
         }
       }
     }
