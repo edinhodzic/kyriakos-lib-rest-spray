@@ -31,6 +31,7 @@ Implementation:
 
 - [Scala](http://www.scala-lang.org/)
 - [Spray](http://spray.io/)
+- [`otrl-lib-repository-h2`](https://github.com/otrl/otrl-lib-repository-h2) (should swap for the `-mariadb` or `-mongo` alternative implementations)
 
 Testing:
 
@@ -39,7 +40,7 @@ Testing:
 
 # Quick start
 
-Follow the below steps to implement a simple service using the abstraction API and then run and invoke service operations.
+The [`otrl-rest-micro-service-spray.g8`](https://github.com/otrl/otrl-rest-micro-service-spray.g8) project can be used to very quickly create RESTful web service projects from scratch which use this library and therefore the above conventions. Alternatively, for a custom implementation, follow the below steps to implement a simple service using the abstraction API and then run and invoke service operations.
 
 ## Implementation
 
@@ -50,27 +51,27 @@ An implementation needs to have three things:
 - converter : this will convert a Spray `HttpEntity` into a domain model object and vice versa
 - service : this will bootstrap the Akka actor system and Spray service 
 
-The router and repository rely on abstractions within another library hence they are quite succinct pieces of code. Suppose we were implementing a user REST service; we would need a:
+The router and repository rely on abstractions within another library hence they are quite succinct pieces of code. Suppose we were implementing a person REST service; we would need a:
 
-- `UserRestRouter`
-- `UserCrudRepository`
-- `UserConverter`
-- `UserRestService`
+- `PersonRestRouter`
+- `PersonCrudRepository`
+- `PersonConverter`
+- `PersonRestService`
 
 Let's build this bottom up.
 
 ### Domain model implementation
 ```scala
-case class User(data: String) extends Identifiable
+case class Person(data: String) extends Identifiable
 ```
 
 ### Converter implementation
 ```scala
-class UserConverter extends Converter[User, HttpEntity] {
+class PersonConverter extends Converter[Person, HttpEntity] {
 
-  override def serialise(user: User): HttpEntity = HttpEntity( """{ "data" : "value" } """)
+  override def serialise(person: Person): HttpEntity = HttpEntity( """{ "data" : "value" } """)
 
-  override def deserialise(httpEntity: HttpEntity): User = new User("value")
+  override def deserialise(httpEntity: HttpEntity): Person = new Person("value")
 
 }
 ```
@@ -78,26 +79,26 @@ class UserConverter extends Converter[User, HttpEntity] {
 
 ### Repository implementation
 ```scala
-class UserCrudRepository extends AbstractH2CrudRepository[User]
+class PersonCrudRepository extends AbstractH2CrudRepository[Person]
 ```
 The above uses a H2 repository implementation (`TODO make this implementation available`) and should be seamlessly interchangeable with other implementations.
     
 ### Router implementation
 ```scala
-object UserRestRouter extends SprayRestRouter[User]
+object PersonRestRouter extends SprayRestRouter[Person]
 ```
 ### Service implementation
 ```scala
-object UserRestService extends App with SimpleRoutingApp {
+object PersonRestService extends App with SimpleRoutingApp {
 
-  implicit val actorSystem = ActorSystem("user-rest-service")
+  implicit val actorSystem = ActorSystem("person-rest-service")
 
-  private implicit val userCrudRepository: UserCrudRepository = new UserCrudRepository
+  private implicit val personCrudRepository: PersonCrudRepository = new PersonCrudRepository
 
-  private implicit val userConverter: UserConverter = new UserConverter
+  private implicit val personConverter: PersonConverter = new PersonConverter
 
   startServer(interface = "localhost", port = 9000) {
-    UserRestRouter.collectionRoute ~ UserRestRouter.itemRoute
+    PersonRestRouter.collectionRoute ~ PersonRestRouter.itemRoute
   }
 
 }
@@ -108,11 +109,11 @@ object UserRestService extends App with SimpleRoutingApp {
 
 ### Create a resource
 ```
-$ curl -iL -X POST http://localhost:9000/user -H content-type:application/json -d '{ "data" : "bob" }'
+$ curl -iL -X POST http://localhost:9000/person -H content-type:application/json -d '{ "data" : "bob" }'
 HTTP/1.1 201 Created
 Server: spray-can/1.3.3
 Date: Tue, 22 Dec 2015 17:46:11 GMT
-Location: /user/123
+Location: /person/123
 Content-Type: text/plain; charset=UTF-8
 Content-Length: 21
 
@@ -121,7 +122,7 @@ Content-Length: 21
     
 ### Read a resource    
 ```
-$ curl -iL http://localhost:9000/user/123
+$ curl -iL http://localhost:9000/person/123
 HTTP/1.1 200 OK
 Server: spray-can/1.3.3
 Date: Tue, 22 Dec 2015 17:46:29 GMT
@@ -137,7 +138,7 @@ Content-Length: 21
 
 ### Delete a resource 
 ```
-$ curl -iL -X DELETE http://localhost:9000/user/123
+$ curl -iL -X DELETE http://localhost:9000/person/123
 HTTP/1.1 204 No Content
 Server: spray-can/1.3.3
 Date: Tue, 22 Dec 2015 17:46:37 GMT
@@ -148,18 +149,10 @@ Content-Length: 0
     
     TODO document this
 
-# What's next?
-
-- [ ] write a REST service using this library
-- [ ] derive from the above service, a giter8 tempalte
-- [ ] use the giter8 template to build micro services from scratch
-
-    TODO provide a standard set of repository implementations for use with the above
-
 ## Incomplete features
 
 - [ ] update and query operations
 
 ## Future development ideas
 
-- [ ] watch this space
+- watch this space
