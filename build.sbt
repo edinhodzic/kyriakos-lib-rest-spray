@@ -19,6 +19,8 @@ libraryDependencies ++= Seq(
   "io.spray" % "spray-routing_2.11" % "1.3.3",
   // akka
   "com.typesafe.akka" % "akka-actor-tests_2.11" % "2.3.9",
+  // kamon
+  "io.kamon" % "kamon-core_2.11" % "0.5.2",
   // logging
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.typesafe.scala-logging" % "scala-logging_2.11" % "3.1.0",
