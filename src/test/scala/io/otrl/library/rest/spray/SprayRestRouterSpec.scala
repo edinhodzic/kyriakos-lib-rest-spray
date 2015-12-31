@@ -1,8 +1,10 @@
 package io.otrl.library.rest.spray
 
-import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
+import io.otrl.library.domain.Identifiable
+import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository}
 import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
+import io.otrl.library.rest.hooks.PassiveRestHooks
 import io.otrl.library.rest.spray.SprayRestRouterSpec._
 import org.mockito.Matchers
 import org.mockito.stubbing.OngoingStubbing
@@ -27,7 +29,7 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
   private implicit val repository: AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource]]
   private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
-  private val resourceRestRouter: SprayRestRouter[Resource] = new SprayRestRouter[Resource]
+  private val resourceRestRouter: SprayRestRouterImpl[Resource] = new SprayRestRouterImpl[Resource]
   private val collectionRoute: Route = resourceRestRouter.collectionRoute
   private val itemRoute: Route = resourceRestRouter.itemRoute
 
@@ -179,6 +181,9 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
   def mockConverterWith(httpEntity: HttpEntity): OngoingStubbing[HttpEntity] = {
     resourceConverter.serialise(Matchers.any(classOf[Resource])) returns httpEntity
   }
+
+  class SprayRestRouterImpl[T <: Identifiable](implicit manifest: Manifest[T])
+    extends SprayRestRouter[T] with PassiveRestHooks[T]
 
 }
 

@@ -2,38 +2,38 @@ package io.otrl.library.rest.spray
 
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.domain.Identifiable
-import io.otrl.library.repository.{Converter, PartialUpdates, AbstractPartialCrudRepository, WholeUpdates}
-import spray.http.HttpEntity
+import io.otrl.library.repository.{AbstractPartialCrudRepository, Converter, PartialUpdates}
+import io.otrl.library.rest.hooks.RestHooks
 import spray.http.HttpHeaders.Location
-import spray.http.StatusCodes._
-import spray.httpx.marshalling.ToResponseMarshallable
+import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound}
+import spray.http.{HttpEntity, HttpResponse}
+import spray.httpx.marshalling.{ToResponseMarshallable => Response}
 import spray.routing._
 
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-// TODO inject collaborators
 /**
-  * A router which exposes REST functionality for a single resource.
+  * An router which exposes REST functionality for a single resource.
   * @tparam T the resource for which to expose REST functionality
   */
-class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with LazyLogging {
+abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with RestHooks[T] with LazyLogging {
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
-  // TODO instead of having the complete(..) in pattern match cases, it would be good to use repositoryTemplate unless that makes the code less legible
   def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
-      entity(as[HttpEntity]) { httpEntity : HttpEntity =>
-        val resource: T = converter.deserialise(httpEntity)
-        logger info s"creating $resource"
-        repository create resource match {
-          case Success(resource) =>
-            respondWithHeader(Location(s"/$serviceUrlPath/${resource.id}")) {
-              complete(Created, converter.serialise(resource))
+      entity(as[HttpEntity]) { httpEntity: HttpEntity =>
+        complete {
+          postHook {
+            val resource: T = converter deserialise httpEntity
+            logger info s"creating $resource"
+            repository create resource match {
+              case Success(resource) => HttpResponse(Created, converter serialise resource, List(Location(s"/$serviceUrlPath/${resource id}")))
+              case Failure(throwable) => internalServerError(throwable)
+              case _ => internalServerError("unknown repository failure")
             }
-          case Failure(throwable) => complete(internalServerError(throwable))
-          case _ => complete(internalServerError("unknown repository failure"))
+          }
         }
       }
     }
@@ -43,36 +43,32 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {
-        logger info s"reading $resourceId"
-        repositoryTemplate(repository read resourceId) { resource : T =>
-          converter.serialise(resource)
+        getHook {
+          logger info s"reading $resourceId"
+          repositoryTemplate(repository read resourceId) { resource: T =>
+            converter.serialise(resource)
+          }
         }
       }
     }
 
-//    def putRoute(implicit resourceId: String): Route = put {
-//      entity(as[HttpEntity]) { httpEntity =>
-//        complete {
-//          logger info s"updating $resourceId"
-//          val resource: T = httpEntityConverter.toResource(httpEntity)
-//          repositoryTemplate(repository update resource) { resource => NoContent }
-//        }
-//      }
-//    }
-
     def putRoute(implicit resourceId: String): Route = put {
       entity(as[String]) { httpEntity =>
         complete {
-          logger info s"updating $resourceId"
-          repositoryTemplate(repository update (resourceId, httpEntity)) { resource => NoContent }
+          putHook {
+            logger info s"updating $resourceId"
+            repositoryTemplate(repository update(resourceId, httpEntity)) { resource => NoContent }
+          }
         }
       }
     }
 
     def deleteRoute(implicit resourceId: String): Route = delete {
       complete {
-        logger info s"deleting $resourceId"
-        repositoryTemplate(repository delete resourceId) { unit : Unit => NoContent }
+        deleteHook {
+          logger info s"deleting $resourceId"
+          repositoryTemplate(repository delete resourceId) { unit: Unit => NoContent }
+        }
       }
     }
 
@@ -81,7 +77,7 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
     }
   }
 
-  private def repositoryTemplate[S](repositoryFunction: (Try[Option[S]]))(successFunction: S => ToResponseMarshallable): ToResponseMarshallable =
+  private def repositoryTemplate[S](repositoryFunction: (Try[Option[S]]))(successFunction: S => Response): Response =
     repositoryFunction match {
       case Success(Some(subject)) => successFunction(subject)
       case Success(None) => NotFound
@@ -89,10 +85,13 @@ class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends
       case _ => internalServerError("unknown repository failure")
     }
 
-  private def internalServerError(message: String): ToResponseMarshallable =
+  private def internalServerError(message: String): Response =
     internalServerError(new RuntimeException(message))
 
-  private def internalServerError(throwable: Throwable): ToResponseMarshallable =
+  private def internalServerError(throwable: Throwable): Response =
     (InternalServerError, throwable)
 
 }
+
+// TODO inject collaborators
+// TODO add query route
