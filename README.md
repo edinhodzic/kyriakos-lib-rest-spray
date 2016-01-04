@@ -6,7 +6,7 @@ This is a small REST service abstraction based on [Spray](http://spray.io/). It 
 
 This project makes and uses the abstractions depicted in the below diagram.
 
-    TODO add class diagram
+![Spray abstractions](https://cloud.githubusercontent.com/assets/4981314/12087767/9921a146-b2cd-11e5-8831-d9afde9dd614.jpg)
 
 ![REST service abstractions]()
 
