@@ -83,7 +83,7 @@ The above uses a H2 repository implementation (`TODO make this implementation av
     
 ### Router implementation
 ```scala
-object PersonRestRouter extends SprayRestRouter[Person]
+object PersonRestRouter extends DefaultSprayRestRouter[Person] // or KamonSprayRestRouter[Person]
 ```
 ### Service implementation
 ```scala
