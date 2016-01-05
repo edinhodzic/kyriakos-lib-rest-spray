@@ -42,7 +42,7 @@ The [`otrl-rest-micro-service-spray.g8`](https://github.com/otrl/otrl-rest-micro
 
 ## Implementation
 
-An implementation needs to have three things:
+An implementation needs to have four things:
 
 - router : this will handle HTTP requests
 - repository : this will perform database queries
@@ -65,21 +65,35 @@ case class Person(data: String) extends Identifiable
 
 ### Converter implementation
 ```scala
-class PersonConverter extends Converter[Person, HttpEntity] {
+import spray.httpx.marshalling._
+import spray.httpx.unmarshalling._
 
-  override def serialise(person: Person): HttpEntity = HttpEntity( """{ "data" : "value" } """)
+implicit object HttpEntityConverter extends Converter[Person, HttpEntity] with LazyLogging {
 
-  override def deserialise(httpEntity: HttpEntity): Person = new Person("value")
+  override def serialise(person: Person): HttpEntity =
+    marshal(person) match {
+      case Right(httpEntity) =>
+        logger debug s"serialised $person into $httpEntity"
+        httpEntity
+      case Left(throwable) => throw throwable
+    }
 
+  override def deserialise(httpEntity: HttpEntity): Person =
+    httpEntity.as[Person] match {
+      case Right(person) =>
+        logger debug s"deserialised $httpEntity into $person"
+        person
+      case Left(deserializationError) => throw new RuntimeException(
+        s"error deserialising $httpEntity into person (info:$deserializationError)")
+    }
 }
 ```
-    TODO the above is a stub, correct it to an actual implementation
 
 ### Repository implementation
 ```scala
 class PersonCrudRepository extends AbstractH2CrudRepository[Person]
 ```
-The above uses a H2 repository implementation (`TODO make this implementation available`) and should be seamlessly interchangeable with other implementations.
+The above uses a H2 repository implementation and should be seamlessly interchangeable with other implementations.
     
 ### Router implementation
 ```scala
@@ -103,7 +117,7 @@ object PersonRestService extends App with SimpleRoutingApp {
 ```
 ## Usage
 
-    TODO document this
+With the above implementation in place, the service shold be ready to perform CRUD and query operations over `Person` domain objects.
 
 ### Create a resource
 ```
