@@ -33,3 +33,5 @@ libraryDependencies ++= Seq(
   "org.specs2" % "specs2-junit_2.11" % "3.6.6" % "test",
   "org.specs2" % "specs2-mock_2.11" % "3.6.6" % "test"
 )
+
+publishTo := Some("OTRL" at "https://mvn.otrl.io")
