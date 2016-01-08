@@ -1,6 +1,6 @@
 package io.otrl.library.rest.converter
 
-import io.otrl.library.repository.Converter
+import io.otrl.library.crud.Converter
 import io.otrl.library.rest.domain.Resource
 import spray.http.HttpEntity
 

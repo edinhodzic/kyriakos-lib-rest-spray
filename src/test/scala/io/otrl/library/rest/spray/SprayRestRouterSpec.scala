@@ -1,7 +1,7 @@
 package io.otrl.library.rest.spray
 
+import io.otrl.library.crud.{PartialCrudOperations, PartialUpdates}
 import io.otrl.library.domain.Identifiable
-import io.otrl.library.repository.{PartialUpdates, AbstractPartialCrudRepository}
 import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
 import io.otrl.library.rest.hooks.PassiveRestHooks
@@ -26,7 +26,7 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
 
   def actorRefFactory = system // connect dsl to test actor system
 
-  private implicit val repository: AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource] = mock[AbstractPartialCrudRepository[Resource] with PartialUpdates[Resource]]
+  private implicit val repository: PartialCrudOperations[Resource] with PartialUpdates[Resource] = mock[PartialCrudOperations[Resource] with PartialUpdates[Resource]]
   private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
   private val resourceRestRouter: SprayRestRouterImpl[Resource] = new SprayRestRouterImpl[Resource]
@@ -136,13 +136,13 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
       repository delete anyString returns triedMaybeUnit
 
     "invoke repository delete function" in {
-      mockRepositoryDeleteToReturn(Success(Some()))
+      mockRepositoryDeleteToReturn(Success(Some(Unit)))
       Delete("/resource/123") ~> itemRoute
       there was one(repository).delete("123")
     }
 
     "return http no content status when repository delete succeeds with some" in {
-      mockRepositoryDeleteToReturn(Success(Some()))
+      mockRepositoryDeleteToReturn(Success(Some(Unit)))
       Delete("/resource/123") ~> itemRoute ~> check {
         status === NoContent
       }

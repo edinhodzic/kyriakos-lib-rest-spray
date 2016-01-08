@@ -1,8 +1,8 @@
 package io.otrl.library.rest.spray
 
 import com.typesafe.scalalogging.LazyLogging
+import io.otrl.library.crud.{Converter, PartialCrudOperations, PartialUpdates}
 import io.otrl.library.domain.Identifiable
-import io.otrl.library.repository.{AbstractPartialCrudRepository, Converter, PartialUpdates}
 import io.otrl.library.rest.hooks.RestHooks
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound}
@@ -21,7 +21,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
-  def collectionRoute(implicit repository: AbstractPartialCrudRepository[T], converter: Converter[T, HttpEntity]): Route = post {
+  def collectionRoute(implicit repository: PartialCrudOperations[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity: HttpEntity =>
         complete {
@@ -39,7 +39,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     }
   }
 
-  def itemRoute(implicit repository: AbstractPartialCrudRepository[T] with PartialUpdates[T], converter: Converter[T, HttpEntity]): Route = {
+  def itemRoute(implicit repository: PartialCrudOperations[T] with PartialUpdates[T], converter: Converter[T, HttpEntity]): Route = {
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {
