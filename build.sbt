@@ -34,4 +34,10 @@ libraryDependencies ++= Seq(
   "org.specs2" % "specs2-mock_2.11" % "3.6.6" % "test"
 )
 
+ivyScala := ivyScala.value map {
+  _.copy(overrideScalaVersion = true)
+}
+
 publishTo := Some("OTRL" at "https://mvn.otrl.io")
+
+scalacOptions ++= Seq("-deprecation", "-feature")
