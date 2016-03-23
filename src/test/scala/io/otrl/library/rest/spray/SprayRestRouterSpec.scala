@@ -1,6 +1,6 @@
 package io.otrl.library.rest.spray
 
-import io.otrl.library.crud.{PartialCrudOperations, PartialUpdates}
+import io.otrl.library.crud.CrudOperations
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.rest.converter.ResourceConverter
 import io.otrl.library.rest.domain.Resource
@@ -12,7 +12,7 @@ import org.specs2.mock.Mockito
 import org.specs2.mutable.Specification
 import spray.http.ContentTypes._
 import spray.http.HttpHeaders.`Content-Type`
-import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound, OK}
+import spray.http.StatusCodes._
 import spray.http._
 import spray.json._
 import spray.routing.{HttpService, Route}
@@ -26,7 +26,7 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
 
   def actorRefFactory = system // connect dsl to test actor system
 
-  private implicit val repository: PartialCrudOperations[Resource] with PartialUpdates[Resource] = mock[PartialCrudOperations[Resource] with PartialUpdates[Resource]]
+  private implicit val repository: CrudOperations[Resource] = mock[CrudOperations[Resource]]
   private implicit val resourceConverter: ResourceConverter = mock[ResourceConverter]
 
   private val resourceRestRouter: SprayRestRouterImpl[Resource] = new SprayRestRouterImpl[Resource]
@@ -125,6 +125,12 @@ class SprayRestRouterSpec extends Specification with Specs2RouteTest with HttpSe
   }
 
   //  "Resource rest router put function" should {
+  //    "do something" in {
+  // TODO implement me
+  //    }
+  //  }
+
+  //  "Resource rest router patch function" should {
   //    "do something" in {
   // TODO implement me
   //    }

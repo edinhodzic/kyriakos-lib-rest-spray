@@ -1,7 +1,7 @@
 package io.otrl.library.rest.spray
 
 import com.typesafe.scalalogging.LazyLogging
-import io.otrl.library.crud.{Converter, PartialCrudOperations, PartialUpdates}
+import io.otrl.library.crud.{Converter, CrudOperations}
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.rest.hooks.RestHooks
 import spray.http.HttpHeaders.Location
@@ -21,7 +21,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
 
   private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
 
-  def collectionRoute(implicit repository: PartialCrudOperations[T], converter: Converter[T, HttpEntity]): Route = post {
+  def collectionRoute(implicit repository: CrudOperations[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity: HttpEntity =>
         complete {
@@ -39,7 +39,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     }
   }
 
-  def itemRoute(implicit repository: PartialCrudOperations[T] with PartialUpdates[T], converter: Converter[T, HttpEntity]): Route = {
+  def itemRoute(implicit repository: CrudOperations[T], converter: Converter[T, HttpEntity]): Route = {
 
     def getRoute(implicit resourceId: String): Route = get {
       complete {
@@ -52,11 +52,13 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
       }
     }
 
-    def putRoute(implicit resourceId: String): Route = put {
+    // TODO implement putRoute
+
+    def patchRoute(implicit resourceId: String): Route = patch {
       entity(as[String]) { httpEntity =>
         complete {
           putHook {
-            logger info s"updating $resourceId"
+            logger info s"partially updating $resourceId"
             repositoryTemplate(repository update(resourceId, httpEntity)) { resource => NoContent }
           }
         }
@@ -73,7 +75,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     }
 
     (pathPrefix(serviceUrlPath) & path(Segment) & pathEndOrSingleSlash) { implicit resourceId: String =>
-      getRoute ~ putRoute ~ deleteRoute
+      getRoute ~ patchRoute ~ deleteRoute
     }
   }
 
