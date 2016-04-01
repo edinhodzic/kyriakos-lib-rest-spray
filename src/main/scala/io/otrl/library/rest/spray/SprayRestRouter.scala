@@ -4,6 +4,7 @@ import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.crud.{Converter, CrudOperations}
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.rest.hooks.RestHooks
+import io.otrl.library.utils.ManifestUtils
 import spray.http.HttpHeaders.Location
 import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound}
 import spray.http.{HttpEntity, HttpResponse}
@@ -19,7 +20,7 @@ import scala.util.{Failure, Success, Try}
   */
 abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]) extends SimpleRoutingApp with RestHooks[T] with LazyLogging {
 
-  private val serviceUrlPath: String = manifest.runtimeClass.getSimpleName.toLowerCase
+  private val serviceUrlPath: String = ManifestUtils.simpleName(manifest)
 
   def collectionRoute(implicit repository: CrudOperations[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {

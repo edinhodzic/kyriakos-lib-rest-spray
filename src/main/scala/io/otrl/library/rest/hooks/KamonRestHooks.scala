@@ -1,6 +1,7 @@
 package io.otrl.library.rest.hooks
 
 import com.typesafe.scalalogging.LazyLogging
+import io.otrl.library.utils.ManifestUtils
 import kamon.Kamon
 import kamon.trace.TraceContext
 import spray.httpx.marshalling.{ToResponseMarshallable => Response}
@@ -14,7 +15,7 @@ import scala.language.postfixOps
 trait KamonRestHooks[T] extends RestHooks[T] with LazyLogging {
 
   // TODO no implicit manifest?
-  private val domain: String = manifest.runtimeClass.getSimpleName.toLowerCase
+  private val domain: String = ManifestUtils.simpleName(manifest)
 
   override protected def postHook(postFunction: => Response): Response =
     kamonTrace(s"$domain-post-trace") {
