@@ -58,7 +58,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     def patchRoute(implicit resourceId: String): Route = patch {
       entity(as[String]) { httpEntity =>
         complete {
-          putHook {
+          patchHook {
             logger info s"partially updating $resourceId"
             repositoryTemplate(repository update(resourceId, httpEntity)) { resource => NoContent }
           }

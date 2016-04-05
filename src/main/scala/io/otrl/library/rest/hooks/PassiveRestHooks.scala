@@ -12,6 +12,8 @@ trait PassiveRestHooks[T] extends RestHooks[T] {
 
   override protected def putHook(putFunction: => Response): Response = putFunction
 
+  override protected def patchHook(putFunction: => Response): Response = putFunction
+
   override protected def deleteHook(deleteFunction: => Response): Response = deleteFunction
 
   override protected def getHook(getFunction: => Response): Response = getFunction

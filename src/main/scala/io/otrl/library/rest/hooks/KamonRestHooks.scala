@@ -32,6 +32,11 @@ trait KamonRestHooks[T] extends RestHooks[T] with LazyLogging {
       putFunction
     }
 
+  override protected def patchHook(putFunction: => Response): Response =
+    kamonTrace(s"$domain-patch-trace") {
+      putFunction
+    }
+
   override protected def deleteHook(deleteFunction: => Response): Response =
     kamonTrace(s"$domain-delete-trace") {
       deleteFunction

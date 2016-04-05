@@ -13,6 +13,8 @@ trait RestHooks[T] {
 
   protected def putHook(putFunction: => Response): Response
 
+  protected def patchHook(putFunction: => Response): Response
+
   protected def deleteHook(deleteFunction: => Response): Response
 
 }
