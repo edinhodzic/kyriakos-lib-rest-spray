@@ -6,7 +6,7 @@ import io.otrl.library.domain.Identifiable
 import io.otrl.library.rest.hooks.RestHooks
 import io.otrl.library.utils.ManifestUtils
 import spray.http.HttpHeaders.Location
-import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound}
+import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound, NotImplemented}
 import spray.http.{HttpEntity, HttpResponse}
 import spray.httpx.marshalling.{ToResponseMarshallable => Response}
 import spray.routing._
@@ -61,7 +61,13 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
       }
     }
 
-    // TODO implement putRoute
+    def putRoute(implicit resourceId: String): Route = put {
+      entity(as[String]) { httpEntity =>
+        complete {
+          HttpResponse(NotImplemented) // TODO implement http put
+        }
+      }
+    }
 
     def patchRoute(implicit resourceId: String): Route = patch {
       entity(as[String]) { httpEntity =>
@@ -84,7 +90,7 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     }
 
     (pathPrefix(serviceUrlPath) & path(Segment) & pathEndOrSingleSlash) { implicit resourceId: String =>
-      getRoute ~ patchRoute ~ deleteRoute
+      getRoute ~ putRoute ~ patchRoute ~ deleteRoute
     }
   }
 
