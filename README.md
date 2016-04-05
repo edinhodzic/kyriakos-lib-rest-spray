@@ -14,14 +14,17 @@ This service abstraction conforms to a set of conventions regarding REST.
 
 ### REST
 
-| Method | Description | Collection URI HTTP response       | Item URI HTTP response             |
-|--------|-------------|------------------------------------|------------------------------------|
-| POST   | Create      | `201 Created` / `409 Conflict`?    | unsupported                        |
-| GET    | Read        | unsupported                        | `200 Ok` / `404 Not Found`         |
-| PUT    | Update      | unsupported                        | `204 No Content` / `404 Not Found` |
-| DELETE | Delete      | unsupported                        | `204 No Content` / `404 Not Found` |
+| Method | Description    | Collection URI HTTP response       | Item URI HTTP response             |
+|--------|----------------|------------------------------------|------------------------------------|
+| POST   | Create         | `201 Created` / `409 Conflict`?    | unsupported                        |
+| GET    | Read           | unsupported                        | `200 Ok` / `404 Not Found`         |
+| PUT    | Whole update   | unsupported                        | `204 No Content` / `404 Not Found` |
+| PATCH  | Partial update | unsupported                        | `204 No Content` / `404 Not Found` |
+| DELETE | Delete         | unsupported                        | `204 No Content` / `404 Not Found` |
 
     TODO add query endpoint convention
+    TODO add ping endpoint convention
+    TODO add health endpoint convention
 
 # What's under the hood?
 

@@ -106,3 +106,4 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
 
 // TODO inject collaborators
 // TODO add query route
+// TODO add health endpoint
