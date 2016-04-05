@@ -22,6 +22,14 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
 
   private val serviceUrlPath: String = ManifestUtils.simpleName(manifest)
 
+  def pingRoute: Route = get {
+    (pathPrefix(serviceUrlPath) & path("ping") & pathEndOrSingleSlash) {
+      complete {
+        "ok"
+      }
+    }
+  }
+
   def collectionRoute(implicit repository: CrudOperations[T], converter: Converter[T, HttpEntity]): Route = post {
     (pathPrefix(serviceUrlPath) & pathEndOrSingleSlash) {
       entity(as[HttpEntity]) { httpEntity: HttpEntity =>
