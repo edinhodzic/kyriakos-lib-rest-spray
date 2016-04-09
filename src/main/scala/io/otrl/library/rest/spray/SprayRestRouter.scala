@@ -1,12 +1,16 @@
 package io.otrl.library.rest.spray
 
+import java.util.jar.Attributes.Name.{IMPLEMENTATION_TITLE, IMPLEMENTATION_VENDOR, IMPLEMENTATION_VERSION}
+import java.util.jar.{Manifest => JdkManifest}
+
 import com.typesafe.scalalogging.LazyLogging
 import io.otrl.library.crud.{Converter, CrudOperations}
 import io.otrl.library.domain.Identifiable
 import io.otrl.library.rest.hooks.RestHooks
 import io.otrl.library.utils.ManifestUtils
 import spray.http.HttpHeaders.Location
-import spray.http.StatusCodes.{Created, InternalServerError, NoContent, NotFound, NotImplemented}
+import spray.http.MediaTypes.`application/json`
+import spray.http.StatusCodes._
 import spray.http.{HttpEntity, HttpResponse}
 import spray.httpx.marshalling.{ToResponseMarshallable => Response}
 import spray.routing._
@@ -26,6 +30,24 @@ abstract class SprayRestRouter[T <: Identifiable](implicit manifest: Manifest[T]
     (pathPrefix(serviceUrlPath) & path("ping") & pathEndOrSingleSlash) {
       complete {
         "ok"
+      }
+    }
+  }
+
+  def versionRoute: Route = get {
+    (pathPrefix(serviceUrlPath) & path("version") & pathEndOrSingleSlash) {
+      val jdkManifest: JdkManifest = new JdkManifest
+      // TODO the below is not picking up the correct manifest when running via sbt
+      jdkManifest read Thread.currentThread().getContextClassLoader().getResourceAsStream("META-INF/MANIFEST.MF")
+
+      respondWithMediaType(`application/json`) {
+        complete(
+          s"""{
+          "implementationVendor" : "${jdkManifest getAttributes (IMPLEMENTATION_VENDOR.toString)}",
+          "implementationTitle" : "${jdkManifest getAttributes (IMPLEMENTATION_TITLE.toString)}",
+          "implementationVersion" : "${jdkManifest getAttributes (IMPLEMENTATION_VERSION.toString)}"
+        }"""
+        )
       }
     }
   }
