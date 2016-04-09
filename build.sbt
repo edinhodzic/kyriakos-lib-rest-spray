@@ -8,7 +8,7 @@ version := "0.6.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-lazy val otrlLibraryRestSpray = project.in(file("."))
+lazy val otrlLibRestSpray = project.in(file("."))
 
 libraryDependencies ++= Seq(
   // scala
