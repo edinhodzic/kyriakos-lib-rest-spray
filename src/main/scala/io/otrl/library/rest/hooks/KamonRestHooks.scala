@@ -14,6 +14,8 @@ import scala.language.postfixOps
   */
 trait KamonRestHooks[T] extends RestHooks[T] with LazyLogging {
 
+  Kamon.start()
+
   // TODO no implicit manifest?
   private val domain: String = ManifestUtils.simpleName(manifest)
 
