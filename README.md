@@ -170,4 +170,5 @@ Content-Length: 0
 
 ## Future development ideas
 
+- hypermedia
 - watch this space
