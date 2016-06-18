@@ -1,7 +1,7 @@
-package io.otrl.library.rest.spray
+package io.kyriakos.library.rest.spray
 
-import io.otrl.library.domain.Identifiable
-import io.otrl.library.rest.hooks.KamonRestHooks
+import io.kyriakos.library.domain.Identifiable
+import io.kyriakos.library.rest.hooks.KamonRestHooks
 
 /**
   * A router which provides Kamon trace instrumentation around

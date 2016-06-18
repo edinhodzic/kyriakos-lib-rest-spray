@@ -1,7 +1,7 @@
-package io.otrl.library.rest.hooks
+package io.kyriakos.library.rest.hooks
 
 import com.typesafe.scalalogging.LazyLogging
-import io.otrl.library.utils.ManifestUtils
+import io.kyriakos.library.utils.ManifestUtils
 import kamon.Kamon
 import kamon.trace.TraceContext
 import spray.httpx.marshalling.{ToResponseMarshallable => Response}

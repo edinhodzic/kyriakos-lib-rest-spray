@@ -1,14 +1,14 @@
 import sbt._
 
-organization := "io.otrl.library"
+organization := "io.kyriakos.library"
 
-name := "otrl-lib-rest-spray"
+name := "kyriakos-lib-rest-spray"
 
 version := "0.6.0-SNAPSHOT"
 
 scalaVersion := "2.11.7"
 
-lazy val otrlLibRestSpray = project.in(file("."))
+lazy val kyriakosLibRestSpray = project.in(file("."))
 
 libraryDependencies ++= Seq(
   // scala
@@ -24,10 +24,10 @@ libraryDependencies ++= Seq(
   // logging
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.typesafe.scala-logging" % "scala-logging_2.11" % "3.1.0",
-  // otrl
-  "io.otrl.library" % "otrl-lib-utils_2.11" % "0.1.0-SNAPSHOT",
-  "io.otrl.library" % "otrl-lib-domain_2.11" % "0.5.0-SNAPSHOT",
-  "io.otrl.library" % "otrl-lib-repository-h2_2.11" % "0.5.0-SNAPSHOT",
+  // kyriakos
+  "io.kyriakos.library" % "kyriakos-lib-utils_2.11" % "0.1.0-SNAPSHOT",
+  "io.kyriakos.library" % "kyriakos-lib-domain_2.11" % "0.5.0-SNAPSHOT",
+  "io.kyriakos.library" % "kyriakos-lib-repository-h2_2.11" % "0.5.0-SNAPSHOT",
   // test
   "io.spray" % "spray-testkit_2.11" % "1.3.3" % "test",
   "org.specs2" % "specs2-core_2.11" % "3.6.6" % "test",
@@ -38,7 +38,5 @@ libraryDependencies ++= Seq(
 ivyScala := ivyScala.value map {
   _.copy(overrideScalaVersion = true)
 }
-
-publishTo := Some("OTRL" at "https://mvn.otrl.io")
 
 scalacOptions ++= Seq("-deprecation", "-feature")

@@ -1,13 +1,13 @@
-package io.otrl.library.rest.spray
+package io.kyriakos.library.rest.spray
 
 import java.util.jar.Attributes.Name.{IMPLEMENTATION_TITLE, IMPLEMENTATION_VENDOR, IMPLEMENTATION_VERSION}
 import java.util.jar.{Manifest => JdkManifest}
 
 import com.typesafe.scalalogging.LazyLogging
-import io.otrl.library.crud.{Converter, CrudOperations}
-import io.otrl.library.domain.Identifiable
-import io.otrl.library.rest.hooks.RestHooks
-import io.otrl.library.utils.ManifestUtils
+import io.kyriakos.library.crud.{Converter, CrudOperations}
+import io.kyriakos.library.domain.Identifiable
+import io.kyriakos.library.rest.hooks.RestHooks
+import io.kyriakos.library.utils.ManifestUtils
 import spray.http.HttpHeaders.Location
 import spray.http.MediaTypes.`application/json`
 import spray.http.StatusCodes._

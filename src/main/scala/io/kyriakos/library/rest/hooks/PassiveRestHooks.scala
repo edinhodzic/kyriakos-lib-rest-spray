@@ -1,4 +1,4 @@
-package io.otrl.library.rest.hooks
+package io.kyriakos.library.rest.hooks
 
 import spray.httpx.marshalling.{ToResponseMarshallable => Response}
 

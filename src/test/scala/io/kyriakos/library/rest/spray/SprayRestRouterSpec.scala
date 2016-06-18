@@ -1,11 +1,11 @@
-package io.otrl.library.rest.spray
+package io.kyriakos.library.rest.spray
 
-import io.otrl.library.crud.CrudOperations
-import io.otrl.library.domain.Identifiable
-import io.otrl.library.rest.converter.ResourceConverter
-import io.otrl.library.rest.domain.Resource
-import io.otrl.library.rest.hooks.PassiveRestHooks
-import io.otrl.library.rest.spray.SprayRestRouterSpec._
+import io.kyriakos.library.crud.CrudOperations
+import io.kyriakos.library.domain.Identifiable
+import io.kyriakos.library.rest.converter.ResourceConverter
+import io.kyriakos.library.rest.domain.Resource
+import io.kyriakos.library.rest.hooks.PassiveRestHooks
+import io.kyriakos.library.rest.spray.SprayRestRouterSpec._
 import org.mockito.Matchers
 import org.mockito.stubbing.OngoingStubbing
 import org.specs2.mock.Mockito

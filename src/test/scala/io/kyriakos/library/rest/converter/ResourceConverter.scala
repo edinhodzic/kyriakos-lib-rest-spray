@@ -1,7 +1,7 @@
-package io.otrl.library.rest.converter
+package io.kyriakos.library.rest.converter
 
-import io.otrl.library.crud.Converter
-import io.otrl.library.rest.domain.Resource
+import io.kyriakos.library.crud.Converter
+import io.kyriakos.library.rest.domain.Resource
 import spray.http.HttpEntity
 
 class ResourceConverter extends Converter[Resource, HttpEntity] {
