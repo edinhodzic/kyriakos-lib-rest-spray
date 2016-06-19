@@ -2,6 +2,8 @@
 
 This is a small REST service abstraction based on [Spray](http://spray.io/). It assumes and operates on a set of conventions around CRUD and query operations.
 
+[![Build Status](https://travis-ci.org/edinhodzic/kyriakos-lib-rest-spray.svg?branch=master)](https://travis-ci.org/edinhodzic/kyriakos-lib-rest-spray)
+
 # Abstractions
 
 This project makes and uses the abstractions depicted in the below diagram.
