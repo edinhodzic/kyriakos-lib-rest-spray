@@ -12,13 +12,15 @@ scalaVersion := "2.11.7"
 lazy val kyriakosLibRestSpray = project.in(file(".")).
   settings(bintrayPublishSettings: _*).
   settings(
-    sbtPlugin := true,
+    sbtPlugin := false,
     name := "kyriakos-lib-rest-spray",
     licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
     publishMavenStyle := false,
     repository in bintray := "kyriakos",
     bintrayOrganization in bintray := None
   )
+
+resolvers += Resolver.url("edinhodzic", url("http://dl.bintray.com/edinhodzic/kyriakos"))(Resolver.ivyStylePatterns)
 
 libraryDependencies ++= Seq(
   // scala
