@@ -37,9 +37,9 @@ libraryDependencies ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.3",
   "com.typesafe.scala-logging" % "scala-logging_2.11" % "3.1.0",
   // kyriakos
-  "io.kyriakos.library" % "kyriakos-lib-utils_2.11" % "0.1.0-SNAPSHOT",
-  "io.kyriakos.library" % "kyriakos-lib-domain_2.11" % "0.5.0-SNAPSHOT",
-  "io.kyriakos.library" % "kyriakos-lib-repository-h2_2.11" % "0.5.0-SNAPSHOT",
+  "io.kyriakos.library" % "kyriakos-lib-utils_2.11" % "1.0.0",
+  "io.kyriakos.library" % "kyriakos-lib-domain_2.11" % "1.0.0",
+  "io.kyriakos.library" % "kyriakos-lib-repository-h2_2.11" % "1.0.0",
   // test
   "io.spray" % "spray-testkit_2.11" % "1.3.3" % "test",
   "org.specs2" % "specs2-core_2.11" % "3.6.6" % "test",
