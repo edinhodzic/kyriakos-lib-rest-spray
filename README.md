@@ -43,7 +43,7 @@ Testing:
 
 # Quick start
 
-The [`kyriakos-rest-micro-service-spray`](https://github.com/edinhodzic/kyriakos-rest-micro-service-spray) project can be used to very quickly create RESTful web service projects from scratch which use this library and therefore the above conventions. Alternatively, for a custom implementation, follow the below steps to implement a simple service using the abstraction API and then run and invoke service operations.
+The [`kyriakos-rest-micro-service-spray.g8`](https://github.com/edinhodzic/kyriakos-rest-micro-service-spray.g8) project can be used to very quickly create RESTful web service projects from scratch which use this library and therefore the above conventions. Alternatively, for a custom implementation, follow the below steps to implement a simple service using the abstraction API and then run and invoke service operations.
 
 ## Implementation
 
